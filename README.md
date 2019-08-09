@@ -1,7 +1,7 @@
-# webfonts-generator
+# webfonts-from-svg
 
 
-[![Build Status](https://travis-ci.org/sunflowerdeath/webfonts-generator.svg?branch=master)](https://travis-ci.org/sunflowerdeath/webfonts-generator)
+[![Build Status](https://travis-ci.org/lwolle/webfonts-from-svg.svg?branch=master)](https://travis-ci.org/lwolle/webfonts-from-svg)
 
 Generator of webfonts from SVG icons.
 
