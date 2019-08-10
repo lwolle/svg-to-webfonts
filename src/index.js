@@ -99,6 +99,10 @@ var webfont = function(options, done) {
 		.then(function(result) {
 			if (options.writeFiles) writeResult(result, options)
 
+            result.getCodepoints = function () {
+                return options.codepoints;
+            }
+
 			result.generateCss = function(urls) {
 				return renderCss(options, urls)
 			}
@@ -117,6 +121,7 @@ function writeResult(fonts, options) {
 		var filepath = path.join(options.dest, options.fontName + '.' + type)
 		writeFile(content, filepath)
 	})
+
 	if (options.css) {
 		var css = renderCss(options)
 		writeFile(css, options.cssDest)
