@@ -7,7 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha tests"
+    "start": "babel src/index.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -40,8 +41,11 @@
   },
   "devDependencies": {
     "file-type": "^3.9.0",
-    "mocha": "^3.1.2",
     "node-sass": "^3.4.2",
-    "read-chunk": "^2.0.0"
+    "read-chunk": "^2.0.0",
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "jest": "^24.8.0"
   }
 }
