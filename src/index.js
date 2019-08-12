@@ -89,10 +89,6 @@ const webfont = (options, done) => {
         return res;
     };
 
-    const preprocessFiles = () => {
-
-    };
-
     options.names.forEach((name) => {
         if (!options.codepoints[name]) {
             options.codepoints[name] = getNextCodepoint();
