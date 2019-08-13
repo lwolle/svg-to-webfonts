@@ -1,5 +1,5 @@
 {
-  "name": "webfonts-from-svg",
+  "name": "svg-to-webfonts",
   "version": "0.1.0",
   "description": "Generator of webfonts from svg icons",
   "main": "src/index.js",
@@ -7,11 +7,12 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha tests"
+    "start": "babel src/index.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lwolle/webfonts-from-svg"
+    "url": "https://github.com/lwolle/svg-to-webfonts"
   },
   "keywords": [
     "font",
@@ -24,7 +25,7 @@
   "author": "lwolle",
   "license": "Unlicense",
   "bugs": {
-    "url": "https://github.com/lwolle/webfonts-from-svg/issues"
+    "url": "https://github.com/lwolle/svg-to-webfonts/issues"
   },
   "dependencies": {
     "handlebars": "^4.0.5",
@@ -40,8 +41,11 @@
   },
   "devDependencies": {
     "file-type": "^3.9.0",
-    "mocha": "^3.1.2",
     "node-sass": "^3.4.2",
-    "read-chunk": "^2.0.0"
+    "read-chunk": "^2.0.0",
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "jest": "^24.8.0"
   }
 }

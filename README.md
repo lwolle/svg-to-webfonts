@@ -1,9 +1,11 @@
-# webfonts-from-svg
+# svg-to-webfonts
 
 
 [![Build Status](https://travis-ci.org/lwolle/webfonts-from-svg.svg?branch=master)](https://travis-ci.org/lwolle/webfonts-from-svg)
 
-Generator of webfonts from SVG icons.
+Generating webfonts from SVG icons.
+
+Sequel of [webfonts-generator](https://github.com/sunflowerdeath/webfonts-generator) by [@sunflowerdeath](https://github.com/sunflowerdeath)
 
 Features:
 
