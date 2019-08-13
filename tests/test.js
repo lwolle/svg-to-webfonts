@@ -35,89 +35,77 @@ describe('webfont', function () {
         for (var i in files) fs.unlinkSync(files[i]);
     });
 
-    it('generates all fonts and css files', function (done) {
-        webfontsGenerator(OPTIONS, function (err) {
-            if (err) return done(err);
+    it('generates all fonts and css files', async () => {
+        const result = await webfontsGenerator(OPTIONS);
+        const destFiles = fs.readdirSync(DEST);
+        for (const i in TYPES) {
+            const type = TYPES[i];
+            const filename = FONT_NAME + '.' + type;
+            const filepath = path.join(DEST, filename);
+            assert(destFiles.indexOf(filename) !== -1, type + ' file exists');
+            assert(fs.statSync(filepath).size > 0, type + ' file is not empty');
 
-            var destFiles = fs.readdirSync(DEST);
-            for (var i in TYPES) {
-                var type = TYPES[i];
-                var filename = FONT_NAME + '.' + type;
-                var filepath = path.join(DEST, filename);
-                assert(destFiles.indexOf(filename) !== -1, type + ' file exists');
-                assert(fs.statSync(filepath).size > 0, type + ' file is not empty');
-
-                var DETECTABLE = ['ttf', 'woff', 'woff2', 'eot'];
-                if (_.contains(DETECTABLE, type)) {
-                    var chunk = readChunk.sync(filepath, 0, 262);
-                    var filetype = getFileType(chunk);
-                    assert.equal(type, filetype && filetype.ext, 'ttf filetype is correct');
-                }
+            const DETECTABLE = ['ttf', 'woff', 'woff2', 'eot'];
+            if (_.contains(DETECTABLE, type)) {
+                const chunk = readChunk.sync(filepath, 0, 262);
+                const filetype = getFileType(chunk);
+                assert.equal(type, filetype && filetype.ext, 'ttf filetype is correct');
             }
+        }
 
-            var cssFile = path.join(DEST, FONT_NAME + '.css');
-            assert(fs.existsSync(cssFile), 'CSS file exists');
-            assert(fs.statSync(cssFile).size > 0, 'CSS file is not empty');
+        const cssFile = path.join(DEST, FONT_NAME + '.css');
+        assert(fs.existsSync(cssFile), 'CSS file exists');
+        assert(fs.statSync(cssFile).size > 0, 'CSS file is not empty');
 
-            var htmlFile = path.join(DEST, FONT_NAME + '.html');
-            assert(!fs.existsSync(htmlFile), 'HTML file does not exists by default');
-
-            done(null);
-        });
+        const htmlFile = path.join(DEST, FONT_NAME + '.html');
+        assert(!fs.existsSync(htmlFile), 'HTML file does not exists by default');
     });
+
     describe('retuns object with', () => {
-        it('fonts', function () {
-            webfontsGenerator(OPTIONS, function (err, result) {
-                assert(result.svg);
-                assert(result.ttf);
-            });
-        });
-
-        it('function generateCss', function (done) {
-            webfontsGenerator(OPTIONS, function (err, result) {
-                assert.equal(typeof result.generateCss, 'function');
-
-                var css = result.generateCss();
-                assert.equal(typeof css, 'string');
-                done();
-            });
-        });
-
-        it('function getCodepoints()', function (done) {
-            const expectedCodepoints = { back: 61697, close: 61698, triangleDown: 61698 };
-            webfontsGenerator(OPTIONS, function (err, result) {
-                const codepoints = result.getCodepoints();
-                assert.deepStrictEqual(codepoints, expectedCodepoints, 'codepoints are not equal');
-                done();
-            });
+        it('fonts', async () => {
+            const result = await webfontsGenerator(OPTIONS);
+            assert(result.svg);
+            assert(result.ttf);
 
         });
 
-        it('function generateCss can change urls', function () {
-            webfontsGenerator(OPTIONS, function (err, result) {
-                var urls = { svg: 'AAA', ttf: 'BBB', woff: 'CCC', eot: 'DDD' };
-                var css = result.generateCss(urls);
-                assert(css.indexOf('AAA') !== -1);
-            });
+        it('function generateCss', async () => {
+            const result = await webfontsGenerator(OPTIONS);
+
+            assert.equal(typeof result.generateCss, 'function');
+
+            const css = result.generateCss();
+
+            assert.equal(typeof css, 'string');
         });
-    });
-    it('gives error when "dest" is undefined', function (done) {
-        var options = _.extend({}, OPTIONS, { dest: undefined });
-        webfontsGenerator(options, function (err) {
-            assert(err !== undefined);
-            done();
+
+        it('function getCodepoints()', async () => {
+            const expectedCodepoints = { back: 61697, close: 61698, triangleDown: 61699 };
+
+            const result = await webfontsGenerator(OPTIONS);
+            const codepoints = result.getCodepoints();
+            assert.deepStrictEqual(codepoints, expectedCodepoints, 'codepoints are not equal');
+        });
+
+        it('function generateCss can change urls', async () => {
+            const result = await webfontsGenerator(OPTIONS);
+            const urls = { svg: 'AAA', ttf: 'BBB', woff: 'CCC', eot: 'DDD' };
+            const css = result.generateCss(urls);
+            assert(css.indexOf('AAA') !== -1);
         });
     });
 
-    it('gives error when "files" is undefined', function (done) {
+    it('gives error when "dest" is undefined', async () => {
+        const options = _.extend({}, OPTIONS, { dest: undefined });
+        expect(() => webfontsGenerator(options)).toThrow('"options.dest" is undefined.');
+    });
+
+    it('gives error when "files" is undefined', async () => {
         var options = _.extend({}, OPTIONS, { files: undefined });
-        webfontsGenerator(options, function (err) {
-            assert(err !== undefined);
-            done();
-        });
+        expect(() => webfontsGenerator(options)).toThrow('"options.files" is undefined.');
     });
 
-    it('uses codepoints and startCodepoint', function (done) {
+    it('uses codepoints and startCodepoint', async () => {
         var START_CODEPOINT = 0x40;
         var CODEPOINTS = {
             close: 0xFF,
@@ -126,120 +114,113 @@ describe('webfont', function () {
             codepoints: CODEPOINTS,
             startCodepoint: START_CODEPOINT,
         });
-        webfontsGenerator(options, function (err) {
-            if (err) return done(err);
 
-            var svg = fs.readFileSync(path.join(DEST, FONT_NAME + '.svg'), 'utf8');
+        await webfontsGenerator(options);
 
-            function codepointInSvg(cp) {
-                return svg.indexOf(cp.toString(16).toUpperCase()) !== -1;
-            }
+        var svg = fs.readFileSync(path.join(DEST, FONT_NAME + '.svg'), 'utf8');
 
-            assert(codepointInSvg(START_CODEPOINT), 'startCodepoint used');
-            assert(codepointInSvg(START_CODEPOINT + 1), 'startCodepoint incremented');
-            assert(codepointInSvg(CODEPOINTS.close), 'codepoints used');
+        function codepointInSvg(cp) {
+            return svg.indexOf(cp.toString(16).toUpperCase()) !== -1;
+        }
 
-            done();
-        });
+        assert(codepointInSvg(START_CODEPOINT), 'startCodepoint used');
+        assert(codepointInSvg(START_CODEPOINT + 1), 'startCodepoint incremented');
+        assert(codepointInSvg(CODEPOINTS.close), 'codepoints used');
+
     });
 
-    it('generates html file when options.html is true', function (done) {
-        var options = _.extend({}, OPTIONS, { html: true });
-        webfontsGenerator(options, function (err) {
-            if (err) return done(err);
+    it('generates html file when options.html is true', async () => {
+        const options = _.extend({}, OPTIONS, { html: true });
 
-            var htmlFile = path.join(DEST, FONT_NAME + '.html');
-            assert(fs.existsSync(htmlFile), 'HTML file exists');
-            assert(fs.statSync(htmlFile).size > 0, 'HTML file is not empty');
+        await webfontsGenerator(options);
 
-            done(null);
-        });
+        const htmlFile = path.join(DEST, FONT_NAME + '.html');
+        assert(fs.existsSync(htmlFile), 'HTML file exists');
+        assert(fs.statSync(htmlFile).size > 0, 'HTML file is not empty');
     });
 
     describe('custom templates', function () {
-        var TEMPLATE = path.join(__dirname, 'customTemplate.hbs');
-        var TEMPLATE_OPTIONS = {
+        const TEMPLATE = path.join(__dirname, 'customTemplate.hbs');
+        const TEMPLATE_OPTIONS = {
             option: 'TEST',
         };
-        var RENDERED_TEMPLATE = 'custom template ' + TEMPLATE_OPTIONS.option + '\n';
+        const RENDERED_TEMPLATE = 'custom template ' + TEMPLATE_OPTIONS.option + '\n';
 
-        it('uses custom css template', function (done) {
+        it('uses custom css template', async () => {
             var options = _.extend({}, OPTIONS, {
                 cssTemplate: TEMPLATE,
                 templateOptions: TEMPLATE_OPTIONS,
             });
-            webfontsGenerator(options, function (err) {
-                if (err) return done(err);
-                var cssFile = fs.readFileSync(path.join(DEST, FONT_NAME + '.css'), 'utf8');
-                assert.equal(cssFile, RENDERED_TEMPLATE);
-                done(null);
-            });
+
+            await webfontsGenerator(options);
+
+            const cssFile = fs.readFileSync(path.join(DEST, FONT_NAME + '.css'), 'utf8');
+            assert.equal(cssFile, RENDERED_TEMPLATE);
         });
 
-        it('uses custom html template', function (done) {
+        it('uses custom html template', async () => {
             var options = _.extend({}, OPTIONS, {
                 html: true,
                 htmlTemplate: TEMPLATE,
                 templateOptions: TEMPLATE_OPTIONS,
             });
-            webfontsGenerator(options, function (err) {
-                if (err) return done(err);
-                var htmlFile = fs.readFileSync(path.join(DEST, FONT_NAME + '.html'), 'utf8');
-                assert.equal(htmlFile, RENDERED_TEMPLATE);
-                done(null);
-            });
+
+            await webfontsGenerator(options);
+            const htmlFile = fs.readFileSync(path.join(DEST, FONT_NAME + '.html'), 'utf8');
+
+            expect(htmlFile).toEqual(RENDERED_TEMPLATE);
         });
     });
 
     describe('scss template', function () {
-        var TEST_SCSS_SINGLE = path.join(__dirname, 'scss', 'singleFont.scss');
-        var TEST_SCSS_MULTIPLE = path.join(__dirname, 'scss', 'multipleFonts.scss');
+        const TEST_SCSS_SINGLE = path.join(__dirname, 'scss', 'singleFont.scss');
+        const TEST_SCSS_MULTIPLE = path.join(__dirname, 'scss', 'multipleFonts.scss');
 
-        it('creates mixins that can be used to create icons styles', function (done) {
-            var DEST_CSS = path.join(DEST, FONT_NAME + '.scss');
-            var options = _.extend({}, OPTIONS, {
+        it('creates mixins that can be used to create icons styles', async () => {
+            const DEST_CSS = path.join(DEST, FONT_NAME + '.scss');
+            const options = _.extend({}, OPTIONS, {
                 cssTemplate: webfontsGenerator.templates.scss,
                 cssDest: DEST_CSS,
             });
-            webfontsGenerator(options, function (err) {
-                if (err) return done(new Error(err));
-                var rendered = sass.renderSync({
-                    file: TEST_SCSS_SINGLE,
-                });
-                var css = rendered.css.toString();
-                assert(css.indexOf(FONT_NAME) !== -1);
-                done(null);
+
+            await webfontsGenerator(options);
+
+            const rendered = sass.renderSync({
+                file: TEST_SCSS_SINGLE,
             });
+            const css = rendered.css.toString();
+
+            assert(css.indexOf(FONT_NAME) !== -1);
         });
 
-        it('multiple scss mixins can be used together', function () {
-            var FONT_NAME_2 = FONT_NAME + '2';
-            var DEST_CSS = path.join(DEST, FONT_NAME + '.scss');
-            var DEST_CSS_2 = path.join(DEST, FONT_NAME_2 + '.scss');
+        it('multiple scss mixins can be used together', async () => {
+            const FONT_NAME_2 = FONT_NAME + '2';
+            const DEST_CSS = path.join(DEST, FONT_NAME + '.scss');
+            const DEST_CSS_2 = path.join(DEST, FONT_NAME_2 + '.scss');
 
-            var options1 = _.extend({}, OPTIONS, {
+            const options1 = _.extend({}, OPTIONS, {
                 cssTemplate: webfontsGenerator.templates.scss,
                 cssDest: DEST_CSS,
                 files: [path.join(SRC, 'close.svg')],
             });
-            var options2 = _.extend({}, OPTIONS, {
+            const options2 = _.extend({}, OPTIONS, {
                 fontName: FONT_NAME_2,
                 cssTemplate: webfontsGenerator.templates.scss,
                 cssDest: DEST_CSS_2,
                 files: [path.join(SRC, 'back.svg')],
             });
 
-            var generate1 = Q.nfcall(webfontsGenerator, options1);
-            var generate2 = Q.nfcall(webfontsGenerator, options2);
+            const generate1 = await webfontsGenerator(options1);
+            const generate2 = await webfontsGenerator(options2);
 
-            return Q.all([generate1, generate2]).then(function () {
-                var rendered = sass.renderSync({
-                    file: TEST_SCSS_MULTIPLE,
-                });
-                var css = rendered.css.toString();
-                assert(css.indexOf(FONT_NAME) !== -1);
-                assert(css.indexOf(FONT_NAME_2) !== -1);
+            const rendered = sass.renderSync({
+                file: TEST_SCSS_MULTIPLE,
             });
+
+            const css = rendered.css.toString();
+            assert(css.indexOf(FONT_NAME) !== -1);
+            assert(css.indexOf(FONT_NAME_2) !== -1);
+
         });
     });
 });

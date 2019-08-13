@@ -45,9 +45,9 @@ const webfont = (options, done) => {
 
     options = Object.assign({}, DEFAULT_OPTIONS, options);
 
-    if (options.dest === undefined) return done(new Error('"options.dest" is undefined.'));
-    if (options.files === undefined) return done(new Error('"options.files" is undefined.'));
-    if (!options.files.length) return done(new Error('"options.files" is empty.'));
+    if (options.dest === undefined) throw new Error('"options.dest" is undefined.');
+    if (options.files === undefined) throw new Error('"options.files" is undefined.');
+    if (!options.files.length) throw new Error('"options.files" is empty.');
 
     // We modify codepoints later, so we can't use same object from default options.
     if (options.codepoints === undefined) options.codepoints = {};
@@ -96,21 +96,23 @@ const webfont = (options, done) => {
     });
 
     // TODO output
-    generateFonts(options)
+    return generateFonts(options)
         .then((result) => {
-            if (options.writeFiles) writeResult(result, options);
+            if (options.writeFiles) {
+                writeResult(result, options);
+            }
 
             result.getCodepoints = function () {
                 return options.codepoints;
-            }
+            };
 
-			result.generateCss = function(urls) {
-				return renderCss(options, urls)
-			}
-			done(null, result)
-		})
-		.catch(function(err) { done(err) })
-}
+            result.generateCss = function (urls) {
+                return renderCss(options, urls);
+            };
+
+            return result;
+        });
+};
 
 const writeFile = (content, dest) => {
     mkdirp.sync(path.dirname(dest));
