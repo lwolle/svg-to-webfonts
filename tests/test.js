@@ -1,27 +1,27 @@
-var fs = require('fs');
-var path = require('path');
-var _ = require('underscore');
-var assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const _ = require('underscore');
+const assert = require('assert');
 
-var sass = require('node-sass');
-var Q = require('q');
-var readChunk = require('read-chunk');
-var getFileType = require('file-type');
+const sass = require('node-sass');
+const Q = require('q');
+const readChunk = require('read-chunk');
+const getFileType = require('file-type');
 
-var webfontsGenerator = require('../src/index');
+const webfontsGenerator = require('../src/index');
 
 describe('webfont', function () {
-    var SRC = path.join(__dirname, 'src');
-    var DEST = path.join(__dirname, 'dest');
+    const SRC = path.join(__dirname, 'src');
+    const DEST = path.join(__dirname, 'dest');
 
-    var FILES = _.map(fs.readdirSync(SRC), function (file) {
+    const FILES = _.map(fs.readdirSync(SRC), function (file) {
         return path.join(SRC, file);
     });
 
-    var TYPES = ['ttf', 'woff', 'woff2', 'eot', 'svg'];
-    var FONT_NAME = 'fontName';
+    const TYPES = ['ttf', 'woff', 'woff2', 'eot', 'svg'];
+    const FONT_NAME = 'fontName';
 
-    var OPTIONS = {
+    const OPTIONS = {
         dest: DEST,
         files: FILES,
         fontName: FONT_NAME,
@@ -29,10 +29,10 @@ describe('webfont', function () {
     };
 
     afterEach(function () {
-        var files = _.map(fs.readdirSync(DEST), function (file) {
+        const files = _.map(fs.readdirSync(DEST), function (file) {
             return path.join(DEST, file);
         });
-        for (var i in files) fs.unlinkSync(files[i]);
+        for (const i in files) fs.unlinkSync(files[i]);
     });
 
     it('generates all fonts and css files', async () => {
@@ -101,23 +101,23 @@ describe('webfont', function () {
     });
 
     it('gives error when "files" is undefined', async () => {
-        var options = _.extend({}, OPTIONS, { files: undefined });
+        const options = _.extend({}, OPTIONS, { files: undefined });
         expect(() => webfontsGenerator(options)).toThrow('"options.files" is undefined.');
     });
 
     it('uses codepoints and startCodepoint', async () => {
-        var START_CODEPOINT = 0x40;
-        var CODEPOINTS = {
+        const START_CODEPOINT = 0x40;
+        const CODEPOINTS = {
             close: 0xFF,
         };
-        var options = _.extend({}, OPTIONS, {
+        const options = _.extend({}, OPTIONS, {
             codepoints: CODEPOINTS,
             startCodepoint: START_CODEPOINT,
         });
 
         await webfontsGenerator(options);
 
-        var svg = fs.readFileSync(path.join(DEST, FONT_NAME + '.svg'), 'utf8');
+        const svg = fs.readFileSync(path.join(DEST, FONT_NAME + '.svg'), 'utf8');
 
         function codepointInSvg(cp) {
             return svg.indexOf(cp.toString(16).toUpperCase()) !== -1;
@@ -147,7 +147,7 @@ describe('webfont', function () {
         const RENDERED_TEMPLATE = 'custom template ' + TEMPLATE_OPTIONS.option + '\n';
 
         it('uses custom css template', async () => {
-            var options = _.extend({}, OPTIONS, {
+            const options = _.extend({}, OPTIONS, {
                 cssTemplate: TEMPLATE,
                 templateOptions: TEMPLATE_OPTIONS,
             });
@@ -159,7 +159,7 @@ describe('webfont', function () {
         });
 
         it('uses custom html template', async () => {
-            var options = _.extend({}, OPTIONS, {
+            const options = _.extend({}, OPTIONS, {
                 html: true,
                 htmlTemplate: TEMPLATE,
                 templateOptions: TEMPLATE_OPTIONS,
