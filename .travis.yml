@@ -11,10 +11,6 @@ node_js:
   - "9"
   - "10"
 stages:
-  - name: test
-        # require the branch name to be master (note for PRs this is the base branch name)
-    script:
-      - npm run test
   - name: coverage
     # require the branch name to be master (note for PRs this is the base branch name)
     if: branch = master
