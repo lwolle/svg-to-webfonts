@@ -8,7 +8,7 @@ const Q = require('q');
 const readChunk = require('read-chunk');
 const getFileType = require('file-type');
 
-const webfontsGenerator = require('../src/index');
+import webfontsGenerator from '../src/index'
 
 describe('webfont', function () {
     const SRC = path.join(__dirname, 'src');
