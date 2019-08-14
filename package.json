@@ -8,7 +8,9 @@
   },
   "scripts": {
     "start": "babel src/index.js",
-    "test": "jest --config=./jest.config.json"
+    "test": "jest --config=./jest.config.json",
+    "coverage": "jest --config=./jest.config.json --collect-coverage",
+    "ci": "npm run coverage && npm run codecov"
   },
   "repository": {
     "type": "git",
