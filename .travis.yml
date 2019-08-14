@@ -1,7 +1,28 @@
-sudo: required
-dist: trusty
 language: node_js
 node_js:
-  - "8"
-  - "9"
-  - "10"
+  - 11
+
+stages:
+  - name: Run Tests
+    if: branch = master
+  - name: Run Tests and Send Coverage
+    if: NOT branch = master
+
+jobs:
+  include:
+    - stage: Run Tests
+      install:
+      - npm install
+      script:
+      - echo "Running Tests"
+      - npm run test
+
+    - stage: Run Tests and Send Coverage
+      install:
+        - npm install
+        - npm install -g codecov
+      script:
+        - echo "Running Tests"
+        - npm run coverage
+      after_success:
+        - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN

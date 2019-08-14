@@ -1,0 +1,4 @@
+{
+  "setupFilesAfterEnv": ["<rootDir>/test-setup.js"],
+  "restoreMocks": true
+}
