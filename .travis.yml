@@ -1,20 +1,28 @@
-sudo:
-  required
-dist:
-  trusty
-language:
-  node_js
-install:
-  - npm install -g codecov
+language: node_js
 node_js:
-  - "8"
-  - "9"
-  - "10"
-stages:git st
-  - name: coverage
-    # require the branch name to be master (note for PRs this is the base branch name)
+  - 11
+
+stages:
+  - name: Run Tests
     if: branch = master
-    script:
+  - name: Run Tests and Send Coverage
+    if: NOT branch = master
+
+jobs:
+  include:
+    - stage: Run Tests
+      install:
       - npm install
-      - npm run coverage
-      - codecov
+      script:
+      - echo "Running Tests"
+      - npm run test
+
+    - stage: Run Tests and Send Coverage
+      install:
+        - npm install
+        - npm install -g codecov
+      script:
+        - echo "Running Tests"
+        - npm run coverage
+      after_success:
+        - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
