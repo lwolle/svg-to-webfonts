@@ -1,7 +1,8 @@
 # svg-to-webfonts
 
 
-[![Build Status](https://travis-ci.org/lwolle/webfonts-from-svg.svg?branch=master)](https://travis-ci.org/lwolle/webfonts-from-svg)
+[![Build Status](https://travis-ci.org/lwolle/svg-to-webfonts.svg?branch=master)](https://travis-ci.org/lwolle/webfonts-from-svg)
+ ![badge](https://codecov.io/gh/lwolle/svg-to-webfonts/branch/feature/master/graph/badge.svg)
 
 Generating webfonts from SVG icons.
 
