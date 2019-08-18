@@ -1,12 +1,14 @@
 language: node_js
 node_js:
-  - 11
+  - 10
+  - 9
+  - 8
 
 stages:
   - name: Run Tests
-    if: branch = master
-  - name: Run Tests and Send Coverage
     if: NOT branch = master
+  - name: Run Tests and Send Coverage
+    if: branch = master
 
 jobs:
   include:
@@ -20,7 +22,6 @@ jobs:
     - stage: Run Tests and Send Coverage
       install:
         - npm install
-        - npm install -g codecov
       script:
         - echo "Running Tests"
         - npm run coverage
