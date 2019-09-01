@@ -1,0 +1,67 @@
+{
+  "plugins": [
+    "sonarjs"
+  ],
+  "extends": [
+    "plugin:sonarjs/recommended",
+    "airbnb"
+  ],
+  "parser": "babel-eslint",
+  "env": {
+    "browser": 1,
+    "jest": 1
+  },
+  "root": true,
+  "rules": {
+    "max-len": [
+      "error",
+      120,
+      2,
+      {
+        "ignoreUrls": true,
+        "ignoreComments": false,
+        "ignoreRegExpLiterals": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "indent": [
+      "error",
+      4,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "no-console": 0,
+    "import/named": 2,
+    "import/prefer-default-export": 0,
+    "import/no-extraneous-dependencies": 0,
+    "import/no-unresolved": 0,
+    "import/extensions": 0,
+    "no-unused-expressions": [
+      "error",
+      {
+        "allowShortCircuit": false,
+        "allowTernary": false,
+        "allowTaggedTemplates": true
+      }
+    ],
+    "object-curly-newline": [
+      "error",
+      {
+        "consistent": true,
+        "multiline": true
+      }
+    ],
+    "no-multiple-empty-lines": [
+      2,
+      {
+        "max": 1
+      }
+    ],
+    "template-curly-spacing": [
+      "error",
+      "always"
+    ]
+  }
+}

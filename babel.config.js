@@ -1,6 +1,6 @@
-require("regenerator-runtime/runtime");
+require('regenerator-runtime/runtime');
 
-module.exports = function (api) {
+module.exports = (api) => {
     api.cache(true);
 
     const presets = ['@babel/preset-env'];
