@@ -27,7 +27,7 @@ const DEFAULT_OPTIONS = {
     htmlTemplate: TEMPLATES.html,
     types: ['eot', 'woff', 'woff2'],
     order: ['eot', 'woff2', 'woff', 'ttf', 'svg'],
-    rename: file => path.basename(file, path.extname(file)),
+    rename: (file) => path.basename(file, path.extname(file)),
     formatOptions: {},
     /**
      * Unicode Private Use Area start.
@@ -57,11 +57,11 @@ const validateOptions = (options) => {
     }
 
     if (options.cssDest === undefined) {
-        validatedOptions.cssDest = path.join(options.dest, options.fontName + '.css');
+        validatedOptions.cssDest = path.join(options.dest, `${ options.fontName }.css`);
     }
 
     if (options.htmlDest === undefined) {
-        validatedOptions.htmlDest = path.join(options.dest, options.fontName + '.html');
+        validatedOptions.htmlDest = path.join(options.dest, `${ options.fontName }.html`);
     }
 
     return validatedOptions;
@@ -75,11 +75,11 @@ const getCodepoints = (options) => {
 
     const getNextCodepoint = () => {
         while (codepointsValues.includes(currentCodepoint)) {
-            currentCodepoint++;
+            currentCodepoint += 1;
         }
 
         const res = currentCodepoint;
-        currentCodepoint++;
+        currentCodepoint += 1;
 
         return res;
     };
@@ -99,7 +99,10 @@ const getCodepoints = (options) => {
 
 const getNames = (userOptions) => userOptions.files.map(userOptions.rename);
 
-const assignDefaultOptions = (options) => Object.assign({}, DEFAULT_OPTIONS, options);
+const assignDefaultOptions = (options) => ({
+    ...DEFAULT_OPTIONS,
+    ...options,
+});
 
 const checkDeprecatedOptions = (options) => {
     const checkedOptions = {
@@ -112,41 +115,16 @@ const checkDeprecatedOptions = (options) => {
     }
 
     // Warn about using deprecated template options.
-    for (const key in options.templateOptions) {
+    const keys = Object.keys(options.templateOptions || {});
+    keys.forEach((key) => {
         const value = options.templateOptions[key];
-        if (key === "baseClass") {
+        if (key === 'baseClass') {
             console.warn("[webfont-generator] Using deprecated templateOptions 'baseClass'. Use 'baseSelector' instead.");
-            checkedOptions.templateOptions.baseSelector = "." + value;
-            break;
+            checkedOptions.templateOptions.baseSelector = `.${ value }`;
         }
-    }
+    });
 
     return checkedOptions;
-};
-
-const webfont = (userOptions) => {
-    const normalizedOptions = checkDeprecatedOptions(userOptions);
-    const options = validateOptions(assignDefaultOptions(normalizedOptions));
-
-    // We modify codepoints later, so we can't use same object from default options.
-    options.names = getNames(options);
-
-
-    options.templateOptions = Object.assign({}, DEFAULT_TEMPLATE_OPTIONS, options.templateOptions);
-
-    options.codepoints = getCodepoints(options);
-
-    return generateFonts(options)
-        .then((result) => {
-            if (options.writeFiles) {
-                writeResult(result, options);
-            }
-
-            result.getCodepoints = () => options.codepoints;
-            result.generateCss = (urls) => renderCss(options, urls);
-
-            return result;
-        });
 };
 
 const writeFile = (content, dest) => {
@@ -156,7 +134,7 @@ const writeFile = (content, dest) => {
 
 const writeResult = (fonts, options) => {
     Object.entries(fonts).forEach(([type, content]) => {
-        var filepath = path.join(options.dest, options.fontName + '.' + type);
+        const filepath = path.join(options.dest, `${ options.fontName }.${ type }`);
 
         writeFile(content, filepath);
     });
@@ -170,6 +148,33 @@ const writeResult = (fonts, options) => {
         const html = renderHtml(options);
         writeFile(html, options.htmlDest);
     }
+};
+
+const webfont = (userOptions) => {
+    const normalizedOptions = checkDeprecatedOptions(userOptions);
+    const options = validateOptions(assignDefaultOptions(normalizedOptions));
+
+    // We modify codepoints later, so we can't use same object from default options.
+    options.names = getNames(options);
+
+    options.templateOptions = { ...DEFAULT_TEMPLATE_OPTIONS, ...options.templateOptions };
+
+    options.codepoints = getCodepoints(options);
+
+    return generateFonts(options)
+        .then((result) => {
+            if (options.writeFiles) {
+                writeResult(result, options);
+            }
+            const generateCodepoints = () => options.codepoints;
+            const generateCss = (urls) => renderCss(options, urls);
+
+            return {
+                ...result,
+                generateCodepoints,
+                generateCss,
+            };
+        });
 };
 
 webfont.templates = TEMPLATES;
