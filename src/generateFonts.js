@@ -1,5 +1,4 @@
 import fs from 'fs';
-import Q from 'q';
 import svgicons2svgfont from 'svgicons2svgfont';
 import svg2ttf from 'svg2ttf';
 import ttf2woff from 'ttf2woff';
@@ -46,7 +45,7 @@ const generators = {
                     font = Buffer.concat([font, data]);
                 })
                 .on('end', () => {
-                    done(null, font.toString());
+                    done(font.toString());
                 });
 
             options.files.forEach((file, idx) => {
@@ -75,7 +74,7 @@ const generators = {
         fn(options, svgFont, done) {
             let font = svg2ttf(svgFont, options.formatOptions.ttf);
             font = Buffer.from(font.buffer);
-            done(null, font);
+            done(font);
         },
     },
 
@@ -84,7 +83,7 @@ const generators = {
         fn(options, ttfFont, done) {
             let font = ttf2woff(new Uint8Array(ttfFont), options.formatOptions.woff);
             font = Buffer.from(font.buffer);
-            done(null, font);
+            done(font);
         },
     },
 
@@ -93,7 +92,7 @@ const generators = {
         fn(options, ttfFont, done) {
             let font = ttf2woff2(new Uint8Array(ttfFont), options.formatOptions.woff2);
             font = Buffer.from(font.buffer);
-            done(null, font);
+            done(font);
         },
     },
 
@@ -102,7 +101,7 @@ const generators = {
         fn(options, ttfFont, done) {
             let font = ttf2eot(new Uint8Array(ttfFont), options.formatOptions.eot);
             font = Buffer.from(font.buffer);
-            done(null, font);
+            done(font);
         },
     },
 };
@@ -118,10 +117,16 @@ const generateFonts = (options) => {
         const generator = generators[type];
         const dependencyTasks = generator.deps.map(makeGeneratorTask);
 
-        const task = Promise.all(dependencyTasks).then((depsFonts) => {
-            const args = [options].concat(depsFonts);
-            return Q.nfapply(generator.fn, args);
-        });
+        const task = Promise.all(dependencyTasks)
+            .then((depsFonts) => {
+                const args = [options].concat(depsFonts);
+
+                const prom = new Promise((resolve) => {
+                    generator.fn(...args, resolve);
+                });
+
+                return prom
+            });
 
         generatorTasks[type] = task;
 

@@ -38,7 +38,6 @@
     "eslint-plugin-sonarjs": "^0.4.0",
     "handlebars": "^4.0.5",
     "mkdirp": "^0.5.0",
-    "q": "^1.1.2",
     "regenerator-runtime": "^0.13.3",
     "svg2ttf": "^4.0.0",
     "svgicons2svgfont": "^5.0.0",
