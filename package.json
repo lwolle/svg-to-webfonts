@@ -61,7 +61,7 @@
     "eslint-plugin-react-hooks": "^1.7.0",
     "file-type": "^3.9.0",
     "jest": "^24.8.0",
-    "node-sass": "^3.4.2",
+    "node-sass": "^4.13.1",
     "read-chunk": "^2.0.0"
   }
 }
